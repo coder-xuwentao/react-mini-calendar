@@ -1,0 +1,16 @@
+.flexBox() {
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  & > * {
+    flex: 1
+  }
+}
+
+.react-mini-calendar__month-view__weekdays {
+  .flexBox();
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.75em;
+}

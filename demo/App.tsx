@@ -1,6 +1,7 @@
 import { Navigation } from '../src'
+import Weekdays from '../src/MonthView/Weekdays'
 
-const App = () => {
+const NavigationDemo = () => {
   return <Navigation
     activeStartDate={new Date()}
     drillUp={console.log}
@@ -8,4 +9,5 @@ const App = () => {
   />
 }
 
-export default App;
+
+export default Weekdays;

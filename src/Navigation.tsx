@@ -77,7 +77,7 @@ export default function Navigation({
       : label;
   }
 
-  function renderButton() {
+  function renderCenterButton() {
     const labelClassName = `${className}__label`;
     return (
       <button
@@ -110,7 +110,7 @@ export default function Navigation({
       >
         {prevLabel}
       </button>
-      {renderButton()}
+      {renderCenterButton()}
 
       <button
         className={`${className}__arrow ${className}__next-button`}
