@@ -1,4 +1,6 @@
 import Navigation from './Navigation';
-import './style.less'
+import Calendar from './Calendar.tsx';
+import './style.less';
 
-export { Navigation }
+export { Calendar, Navigation };
+export default Calendar;
