@@ -30,7 +30,7 @@ interface NavigationProps {
   view: View;
 }
 
-const className = 'react-mini-calendar__navigation';
+const className = 'mini-calendar__navigation';
 
 export default function Navigation({
   activeStartDate,

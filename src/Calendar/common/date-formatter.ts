@@ -41,6 +41,14 @@ const formatMonthYearOptions: Options = {
 const formatShortWeekdayOptions: Options = { weekday: 'short' };
 const formatWeekdayOptions: Options = { weekday: 'long' };
 const formatYearOptions: Options = { year: 'numeric' };
+const formatTimeOptions: Options = {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+};
 
 export const formatDate = getFormatter(formatDateOptions);
 export const formatDay = getFormatter(formatDayOptions);
@@ -50,6 +58,7 @@ export const formatMonthYear = getFormatter(formatMonthYearOptions);
 export const formatShortWeekday = getFormatter(formatShortWeekdayOptions);
 export const formatWeekday = getFormatter(formatWeekdayOptions);
 export const formatYear = getFormatter(formatYearOptions);
+export const formatTime = getFormatter(formatTimeOptions);
 
 export function formatDecade ([start, end]: [Date, Date], locale?: string) {
   return `${formatYear(start, locale)} - ${formatYear(end, locale)}`

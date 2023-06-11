@@ -1,0 +1,25 @@
+.mini-time-picker {
+  display: inline-block;
+}
+.mini-time-picker__result {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.mini-time-picker__select {
+  --select-height: 1.2em;
+  position: relative;
+  width: 2em;
+  height: var(--select-height);
+  line-height: var(--select-height);
+  border: 1px solid #a0a096;
+  &__options {
+    position: absolute;
+    top: var(--select-height);
+    height: 8em;
+    &__option {
+      height: 1em;
+    }
+  }
+}

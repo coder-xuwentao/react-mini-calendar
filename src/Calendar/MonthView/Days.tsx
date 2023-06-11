@@ -3,7 +3,7 @@ import { getDaysInMonth, areDatesEqual, isInDatesRange } from '../common/date-ut
 import { OnChangeFunc, Value } from '../common/types';
 import Day from './Day';
 
-const className = 'react-mini-calendar__month-view__days';
+const className = 'mini-calendar__month-view__days';
 
 interface DaysProps {
   activeStartDate: Date;
@@ -75,7 +75,12 @@ export default function Days(props: DaysProps) {
 
   const isActiveDate = useCallback((date: Date) => {
     if (value instanceof Array) {
-      return isInDatesRange(date, value)
+      return isInDatesRange(date, value) 
+      || areDatesEqual(date, 
+        value && new Date(value[0].getFullYear(), value[0].getMonth(), value[0].getDate())
+      ) || areDatesEqual(date, 
+        value && new Date(value[1].getFullYear(), value[1].getMonth(), value[1].getDate())
+      )
     }
     return areDatesEqual(date, 
       value && new Date(value.getFullYear(), value.getMonth(), value.getDate())

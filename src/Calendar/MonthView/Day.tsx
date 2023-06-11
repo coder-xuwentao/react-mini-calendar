@@ -10,7 +10,7 @@ interface DayProps {
   locale?: string;
 }
 
-const className = 'react-mini-calendar__month-view__days_day';
+const className = 'mini-calendar__month-view__days_day';
 
 export default function Day({ date, dayPoint, locale, isActive, isHover }: DayProps) {
   const year = date.getFullYear();

@@ -6,8 +6,9 @@ import { useState, useCallback, useMemo } from 'react';
 import { View, sortedViews } from './common/constants';
 import { getMonthStart, areDatesEqual, getDateBySetMonth, getDateBySetYear } from './common/date-utils';
 import { onActiveStartDateChangeArgs, Action, OnChangeFunc, Value } from './common/types';
+import classNames from 'classnames';
 
-const baseClassName = 'react-mini-calendar';
+const baseClassName = 'mini-calendar';
 
 export type CalendarProps = {
   defaultValue?: Value;
@@ -15,11 +16,14 @@ export type CalendarProps = {
   showNavigation?: boolean;
   locale?: string;
   selectRangeEnable?: boolean;
+  className?: string;
   onChange?: (value: Value) => void;
   onClickDay?: OnChangeFunc;
   onClickMonth?: OnChangeFunc;
   onClickYear?: OnChangeFunc;
   onActiveStartDateChange?: (args: onActiveStartDateChangeArgs) => void;
+  calendarRef?: React.Ref<HTMLDivElement>;
+  [key: string]: any;
 };
 
 function getInitActiveStartDate(defaultValue?: Value, valueProp?: Value) {
@@ -45,6 +49,9 @@ export default function Calendar(props: CalendarProps) {
     onClickMonth,
     onClickYear,
     onActiveStartDateChange,
+    className: classNameProp,
+    calendarRef,
+    ...otherProps
   } = props;
   const [activeStartDateState, setActiveStartDateState] = useState<Date>(getInitActiveStartDate(defaultValue, valueProp));
   const [viewState, setViewState] = useState<View>(View.Month);
@@ -56,7 +63,6 @@ export default function Calendar(props: CalendarProps) {
     return valueState;
   }, [valueProp, valueState]);
   const setValue = useCallback((newValue: Value) => {
-    console.log('tao 2', newValue);
     if (valueProp === undefined) {
       setValueState(newValue);
     }
@@ -96,10 +102,9 @@ export default function Calendar(props: CalendarProps) {
 
   const handleClickDay = useCallback((date: Date, event: React.MouseEvent) => {
     onClickDay?.(date, event);
-    console.log('tao 1', value);
     if (selectRangeEnable && value instanceof Date) {
       if (value.getTime() ===  date.getTime()) {
-        setValue(date);
+        return;
       } else {
         setValue([value, date].sort((a, b) => a.getTime() - b.getTime()) as [Date, Date]);
       }
@@ -165,10 +170,10 @@ export default function Calendar(props: CalendarProps) {
   }
 
   return (
-    <div className={baseClassName}>
+    <div className={classNames(baseClassName, classNameProp)} ref={calendarRef} {...otherProps}>
       {renderNavigation()}
       <div
-        className={`${baseClassName}__viewContainer`}
+        className={`${baseClassName}__view-container`}
       >
         {renderContent()}
       </div>

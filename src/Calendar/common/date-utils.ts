@@ -1,4 +1,4 @@
-import { View } from '../common/constants';
+import { View } from './constants';
 
 // 某月有几天
 export function getDaysInMonth(date: Date) {

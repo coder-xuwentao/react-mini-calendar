@@ -10,7 +10,7 @@ interface MonthViewProps {
   selectRangeEnable?: boolean;
 }
 
-const className = 'react-mini-calendar__month-view';
+const className = 'mini-calendar__month-view';
 
 export default function MonthView(porps: MonthViewProps) {
   return (

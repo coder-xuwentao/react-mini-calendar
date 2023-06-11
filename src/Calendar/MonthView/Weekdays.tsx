@@ -13,7 +13,7 @@ interface WeekdaysProps {
   locale?: string;
 }
 
-const className = 'react-mini-calendar__month-view__weekdays';
+const className = 'mini-calendar__month-view__weekdays';
 
 export default function Weekdays({
   locale

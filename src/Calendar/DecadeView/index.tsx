@@ -3,9 +3,9 @@ import { getForeYear, getDecadeFromDate } from '../common/date-utils';
 import { formatYear } from '../common/date-formatter';
 import classNames from 'classnames';
 import { useCallback } from 'react';
-import { Value } from '../common/types';
+import type { Value } from '../common/types';
 
-const className = 'react-calendar__year-view__years';
+const className = 'mini-calendar__year-view__years';
 
 interface YearViewProps {
   locale?: string;
