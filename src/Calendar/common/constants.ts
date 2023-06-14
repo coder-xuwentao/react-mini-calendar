@@ -1,7 +1,7 @@
 export enum View {
+  'Decade',
   'Year',
   'Month',
-  'Decade'
 }
 
 export const sortedViews = [View.Decade, View.Year, View.Month];

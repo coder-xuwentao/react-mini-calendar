@@ -1,11 +1,23 @@
 .mini-time-picker {
   display: inline-block;
 }
+
+.mini-time-picker__scrollboxs {
+  width: 100%;
+  &__scrollbox {
+    overflow-x: hidden;
+    width: 33.33%;
+  }
+}
+
 .mini-time-picker__result {
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  &__desc {
+    white-space: nowrap;
+  }
 }
 .mini-time-picker__select {
   --select-height: 1.2em;

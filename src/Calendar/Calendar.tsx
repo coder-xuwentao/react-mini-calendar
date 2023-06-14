@@ -2,7 +2,7 @@ import Navigation from './Navigation';
 import MonthView from './MonthView';
 import YearView from './YearView';
 import DecadeView from './DecadeView';
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { View, sortedViews } from './common/constants';
 import { getMonthStart, areDatesEqual, getDateBySetMonth, getDateBySetYear } from './common/date-utils';
 import { onActiveStartDateChangeArgs, Action, OnChangeFunc, Value } from './common/types';
@@ -23,6 +23,9 @@ export type CalendarProps = {
   onClickYear?: OnChangeFunc;
   onActiveStartDateChange?: (args: onActiveStartDateChangeArgs) => void;
   calendarRef?: React.Ref<HTMLDivElement>;
+  defaultView?: View;
+  maxDate?: Date;
+  minDate?: Date;
   [key: string]: any;
 };
 
@@ -51,10 +54,13 @@ export default function Calendar(props: CalendarProps) {
     onActiveStartDateChange,
     className: classNameProp,
     calendarRef,
+    maxDate,
+    minDate,
+    defaultView,
     ...otherProps
   } = props;
   const [activeStartDateState, setActiveStartDateState] = useState<Date>(getInitActiveStartDate(defaultValue, valueProp));
-  const [viewState, setViewState] = useState<View>(View.Month);
+  const [viewState, setViewState] = useState<View>(defaultView|| View.Month);
   const [valueState, setValueState] = useState<Value>(defaultValue);
   const value = useMemo<Value>(() => {
     if (valueProp !== undefined) {
@@ -86,6 +92,7 @@ export default function Calendar(props: CalendarProps) {
     [activeStartDateState, onActiveStartDateChange, value, viewState],
   );
 
+  // 深入到月
   const haddleDrillDownToMonth = useCallback((monthIdx: number, event: React.MouseEvent) => {
     setViewState(View.Month);
     const nextStartDate = getDateBySetMonth(activeStartDateState, monthIdx);
@@ -93,6 +100,7 @@ export default function Calendar(props: CalendarProps) {
     onClickMonth?.(nextStartDate, event);
   }, [activeStartDateState, setActiveStartDate, onClickMonth]);
 
+  // 深入到年
   const haddleDrillDownToYear = useCallback((year: number, event: React.MouseEvent) => {
     setViewState(View.Year);
     const nextStartDate = getDateBySetYear(activeStartDateState, year);
@@ -100,10 +108,11 @@ export default function Calendar(props: CalendarProps) {
     onClickYear?.(nextStartDate, event);
   }, [activeStartDateState, setActiveStartDate, onClickYear]);
 
+  // 在月视图点击“日”单元按钮，显然无需做深入操作
   const handleClickDay = useCallback((date: Date, event: React.MouseEvent) => {
     onClickDay?.(date, event);
     if (selectRangeEnable && value instanceof Date) {
-      if (value.getTime() ===  date.getTime()) {
+      if (value.getTime() === date.getTime()) {
         return;
       } else {
         setValue([value, date].sort((a, b) => a.getTime() - b.getTime()) as [Date, Date]);
@@ -113,13 +122,23 @@ export default function Calendar(props: CalendarProps) {
     }
   }, [value, setValue, onClickDay, selectRangeEnable]);
 
+  // 向上泛出
   const handleDrillUp = useCallback(() => {
+    // sortedViews为 [View.Decade, View.Year, View.Month];
     const drillUpAvailable = sortedViews.indexOf(viewState) > 0;
     if (drillUpAvailable) {
       setViewState(sortedViews[sortedViews.indexOf(viewState) - 1]);
     }
 
   }, [viewState]);
+
+  useEffect(function validateLimitProps() {
+    if (minDate && maxDate && minDate > maxDate) {
+      throw new Error(
+        `Invalid minDate and maxDate: minDate cannot be larger than maxDate.`,
+      );
+    }
+  }, [minDate, maxDate])
 
   function renderNavigation() {
     if (!showNavigation) {
@@ -132,6 +151,8 @@ export default function Calendar(props: CalendarProps) {
         onDrillUp={handleDrillUp}
         view={viewState}
         locale={locale}
+        minDate={minDate}
+        maxDate={maxDate}
       />
     );
   }
@@ -145,6 +166,8 @@ export default function Calendar(props: CalendarProps) {
             locale={locale}
             activeStartDate={activeStartDateState}
             onClickYear={haddleDrillDownToYear}
+            minDate={minDate}
+            maxDate={maxDate}
           />
         );
       case View.Year:
@@ -154,6 +177,8 @@ export default function Calendar(props: CalendarProps) {
             locale={locale}
             activeStartDate={activeStartDateState}
             onClickMonth={haddleDrillDownToMonth}
+            minDate={minDate}
+            maxDate={maxDate}
           />
         );
       case View.Month:
@@ -164,6 +189,8 @@ export default function Calendar(props: CalendarProps) {
             activeStartDate={activeStartDateState}
             onClickDay={handleClickDay}
             selectRangeEnable={selectRangeEnable}
+            minDate={minDate}
+            maxDate={maxDate}
           />
         );
     }

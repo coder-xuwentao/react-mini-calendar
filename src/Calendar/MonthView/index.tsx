@@ -8,15 +8,17 @@ interface MonthViewProps {
   onClickDay?: OnChangeFunc;
   value: Value,
   selectRangeEnable?: boolean;
+  maxDate?: Date;
+  minDate?: Date;
 }
 
 const className = 'mini-calendar__month-view';
 
-export default function MonthView(porps: MonthViewProps) {
+export default function MonthView(props: MonthViewProps) {
   return (
     <div className={className}>
-      <Weekdays locale={porps.locale} />
-      <Days {...porps} />
+      <Weekdays locale={props.locale} />
+      <Days {...props} />
     </div>
   );
 }

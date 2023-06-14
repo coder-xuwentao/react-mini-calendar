@@ -8,11 +8,12 @@ interface DayProps {
   isActive: boolean;
   isHover: boolean;
   locale?: string;
+  disabled?: boolean;
 }
 
 const className = 'mini-calendar__month-view__days_day';
 
-export default function Day({ date, dayPoint, locale, isActive, isHover }: DayProps) {
+export default function Day({ date, dayPoint, locale, isActive, isHover, disabled }: DayProps) {
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
   const dayOfMonth = date.getDate();
@@ -31,6 +32,7 @@ export default function Day({ date, dayPoint, locale, isActive, isHover }: DayPr
         [`${className}--hover`]: isHover,
       })}
       data-date={dateStr}
+      disabled={disabled}
     >
       {formatDay(date, locale)}
     </button>

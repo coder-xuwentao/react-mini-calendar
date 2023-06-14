@@ -12,6 +12,8 @@ interface YearViewProps {
   activeStartDate: Date;
   value: Value;
   onClickYear?: (year: number, event: React.MouseEvent) => void;
+  maxDate?: Date;
+  minDate?: Date;
 }
 
 export default function YearView({
@@ -19,6 +21,8 @@ export default function YearView({
   activeStartDate,
   value,
   onClickYear,
+  maxDate,
+  minDate
 }: YearViewProps) {
   const handleClickYear = useCallback((event: React.MouseEvent) => {
     if (!(event.target instanceof HTMLButtonElement)) {
@@ -28,6 +32,17 @@ export default function YearView({
     const { year } = event.target.dataset;
     onClickYear?.(Number(year), event);
   }, [onClickYear]);
+
+  const isDisabledYear = useCallback((year: number) => {
+    let disabled = false;
+    if (maxDate) {
+      disabled ||= year > maxDate.getFullYear();
+    }
+    if (minDate) {
+      disabled ||= year < minDate.getFullYear();
+    }
+    return disabled
+  }, [maxDate, minDate])
 
   const isActiveYear = useCallback((year: number) => {
     if (value instanceof Array) {
@@ -50,7 +65,9 @@ export default function YearView({
           data-year={year}
           className={classNames(`${className}__year`, tileClassName, {
             [`${tileClassName}--active`]: isActiveYear(year),
-          })}>
+          })}
+          disabled={isDisabledYear(year)}
+        >
           {formatYear(currentYear, locale)}
         </button>
       );
@@ -58,7 +75,6 @@ export default function YearView({
     }
     return yearBtns;
   }
-
 
   return (
     <div className={className} onClick={handleClickYear}>

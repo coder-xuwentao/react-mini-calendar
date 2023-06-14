@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { getDaysInMonth, areDatesEqual, isInDatesRange } from '../common/date-utils';
+import { useCallback, useMemo, useState } from 'react';
+import { getDaysInMonth, areDatesEqual, isInDatesRange, getDayStart } from '../common/date-utils';
 import { OnChangeFunc, Value } from '../common/types';
 import Day from './Day';
 
@@ -11,6 +11,8 @@ interface DaysProps {
   onClickDay?: OnChangeFunc;
   value: Value,
   selectRangeEnable?: boolean;
+  maxDate?: Date;
+  minDate?: Date;
 }
 
 export default function Days(props: DaysProps) {
@@ -20,12 +22,13 @@ export default function Days(props: DaysProps) {
     onClickDay,
     value,
     selectRangeEnable,
+    maxDate,
+    minDate,
   } = props;
-
   const [hoverDate, setHoverDate] = useState<Date | null>(null);
 
-  const year = activeStartDate.getFullYear();
-  const monthIndex = activeStartDate.getMonth();
+  const startYear = useMemo(() => activeStartDate.getFullYear(), [activeStartDate]);
+  const startMonth = useMemo(() => activeStartDate.getMonth(), [activeStartDate]);
   const dayOfWeek = activeStartDate.getDay() || 7; // 周几。getDay为0，即周日
   const daysInMonth = getDaysInMonth(activeStartDate);
 
@@ -33,7 +36,7 @@ export default function Days(props: DaysProps) {
   // 会考虑临近的省份, 所以start大概率是负数, end大概率大于30
   const start = -dayOfWeek + 2; // 比如2023.6.1是周四，start = -4 + 2 = -2。所以需要往前一月推测3天: -2、-1、0
   const end = (() => {
-    const activeEndDate = new Date(year, monthIndex, daysInMonth);
+    const activeEndDate = new Date(startYear, startMonth, daysInMonth);
     const daysUntilEndOfTheWeek = 7 - activeEndDate.getDay(); // 计算原理类似start
     if (daysUntilEndOfTheWeek === 7) {
       return daysInMonth;
@@ -52,7 +55,7 @@ export default function Days(props: DaysProps) {
     onClickDay?.(new Date(clickedDate), event);
   }, [onClickDay]);
 
-  // 不需要debounce: 用户鼠标移动速度都很快
+  // 不需要debounce, 否则会卡
   const handleHoverIn = useCallback((event: React.MouseEvent) => {
     if (!selectRangeEnable) {
       return;
@@ -77,9 +80,9 @@ export default function Days(props: DaysProps) {
     if (value instanceof Array) {
       return isInDatesRange(date, value) 
       || areDatesEqual(date, 
-        value && new Date(value[0].getFullYear(), value[0].getMonth(), value[0].getDate())
+        value && getDayStart(value[0])
       ) || areDatesEqual(date, 
-        value && new Date(value[1].getFullYear(), value[1].getMonth(), value[1].getDate())
+        value && getDayStart(value[1])
       )
     }
     return areDatesEqual(date, 
@@ -87,8 +90,18 @@ export default function Days(props: DaysProps) {
     )
   }, [value])
 
+  const isDisabledDay = useCallback((date: Date) => {
+    let disabled = false;
+    if (maxDate && !areDatesEqual(date, getDayStart(maxDate))) {
+      disabled ||= date.getTime() > maxDate.getTime()
+    }
+    if (minDate && !areDatesEqual(date, getDayStart(minDate))) {
+      disabled ||= date.getTime() < minDate.getTime()
+    }
+    return disabled;
+  }, [minDate, maxDate])
+
   const isHover = useCallback((date: Date) => {
-    // console.log('hoverDate', hoverDate)
     if (!hoverDate) {
       return false;
     }
@@ -101,13 +114,14 @@ export default function Days(props: DaysProps) {
   function renderDays() {
     const dayTiles = [];
     for (let dayPoint = start; dayPoint <= end; dayPoint += 1) {
-      const date = new Date(year, monthIndex, dayPoint);
+      const date = new Date(startYear, startMonth, dayPoint);
       dayTiles.push(
         <Day
           key={dayPoint}
           date={date}
           dayPoint={dayPoint}
           locale={locale}
+          disabled={isDisabledDay(date)}
           isActive={isActiveDate(date)}
           isHover={isHover(date)}
         />

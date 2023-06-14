@@ -113,14 +113,18 @@
   &:enabled:hover {
     background: #e6e6e6;
   }
+  &:disabled {
+    color: rgba(16, 16, 16, 0.3);
+  }
 
   &--active {
-    background: #006edc;
     color: white;
+    background: #006edc;
   }
 
   &--active:enabled:hover,
   &--active:enabled:focus {
+    color: white;
     background: #1087ff;
   }
 }

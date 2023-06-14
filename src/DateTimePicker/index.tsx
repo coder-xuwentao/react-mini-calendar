@@ -1,6 +1,8 @@
 import { useRef, useState, useLayoutEffect } from 'react';
 import Calendar from '../Calendar';
 import type { Value } from '../Calendar/common/types';
+import { View } from '../Calendar/common/constants';
+import { getDayStart, areDatesEqual } from '../Calendar/common/date-utils';
 
 import TimePicker from '../TimePicker';
 import type { onChangeArgs } from '../TimePicker';
@@ -19,21 +21,45 @@ interface DateTimePickerProps {
   locale?: string;
   onChange?: (date: Value) => void;
   selectRangeEnable?: boolean;
+  maxDate?: Date;
+  minDate?: Date;
+  defaultView?: View;
 }
 
 export default function DateTimePicker({
   locale,
   onChange,
-  selectRangeEnable
+  selectRangeEnable,
+  maxDate,
+  minDate,
+  defaultView,
 }: DateTimePickerProps) {
   const [value, setValue] = useState<Value>();
   const [calendarActive, setCalendarActive] = useState(true);
+  const [minDateForTime, setMinDateForTime] = useState<Date | undefined>();
+  const [maxDateForTime, setMaxDateForTime] = useState<Date | undefined>();
   const calendarRef = useRef<HTMLDivElement>(null);
-  const coverStyle = useRef({});
+  const [coverStyle, setCoverStyle] = useState<{ width: number; height: number } | undefined>()
+
+  function setMinOrMaxForTime(date?: Date)  {
+    minDate && setMinDateForTime(undefined)
+    maxDate && setMaxDateForTime(undefined)
+    if (!date) {
+      return;
+    }
+    if (minDate && areDatesEqual(date, getDayStart(minDate))) {
+      setMinDateForTime(minDate)
+    }
+    if (maxDate && areDatesEqual(date, getDayStart(maxDate))) {
+      setMaxDateForTime(maxDate) 
+    }
+  }
 
   function handleCalendarChange(value: Value) {
     setValue(value);
     setCalendarActive(false);
+    setMinOrMaxForTime(value instanceof Array ? value[1] : value);
+
     onChange?.(value);
   }
 
@@ -57,8 +83,8 @@ export default function DateTimePicker({
       return;
     }
     const { height, width } = calendarRef.current.getBoundingClientRect();
-    coverStyle.current = { height, width };
-  }, []);
+    setCoverStyle({ height, width });
+  }, [value]);
 
   return (
     <div className='date-time-picker'>
@@ -68,11 +94,19 @@ export default function DateTimePicker({
         selectRangeEnable={selectRangeEnable}
         calendarRef={calendarRef}
         locale={locale}
+        maxDate={maxDate}
+        minDate={minDate}
+        defaultView={defaultView}
       />
 
       {!calendarActive && <>
-        <div className='date-time-picker__calendar-cover' style={coverStyle.current}></div>
-        <TimePicker showConfirm onConfirm={handleTimeConfirm} />
+        <div className='date-time-picker__calendar-cover' style={coverStyle}></div>
+        <TimePicker 
+          showConfirm
+          onConfirm={handleTimeConfirm}
+          minDate={minDateForTime}
+          maxDate={maxDateForTime}
+        />
       </>}
     </div>
   );

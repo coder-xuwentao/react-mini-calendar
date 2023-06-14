@@ -2,11 +2,13 @@ import { View, sortedViews } from './common/constants';
 import { Action } from './common/types';
 import { formatYear, formatMonthYear, formatDecade } from './common/date-formatter';
 import {
-  getStartDatePrevious,
-  getStartDatePrevious2,
-  getStartDateNext,
-  getStartDateNext2,
+  getDatePrevious,
+  getDatePrevious2,
+  getDateNext,
+  getDateNext2,
   getDecadeFromDate,
+  getBeginDate,
+  getEndDate,
 } from './common/date-utils';
 
 export type NavigationLabelArgs = {
@@ -21,13 +23,15 @@ interface NavigationProps {
   activeStartDate: Date;
   locale?: string;
   onDrillUp: () => void;
-  navigationLabel?: NavigationLabelFunc;
-  next2Label?: React.ReactNode;
-  nextLabel?: React.ReactNode;
-  prev2Label?: React.ReactNode;
-  prevLabel?: React.ReactNode;
+  navigationLabel?: NavigationLabelFunc; // todo: 暂时采用默认的
+  next2Label?: React.ReactNode; // todo: 暂时采用默认的
+  nextLabel?: React.ReactNode; // todo: 暂时采用默认的
+  prev2Label?: React.ReactNode; // todo: 暂时采用默认的
+  prevLabel?: React.ReactNode; // todo: 暂时采用默认的
   setActiveStartDate: (nextActiveStartDate: Date, action: Action) => void;
   view: View;
+  maxDate?: Date;
+  minDate?: Date;
 }
 
 const className = 'mini-calendar__navigation';
@@ -43,32 +47,51 @@ export default function Navigation({
   setActiveStartDate,
   locale,
   view,
+  minDate,
+  maxDate,
 }: NavigationProps) {
+  // new start date:
+  const previousActiveStartDate = getBeginDate(view, getDatePrevious(view, activeStartDate));
+  const previousActiveStartDate2 = getBeginDate(view, getDatePrevious2(view, activeStartDate));
+  const nextActiveStartDate = getBeginDate(view, getDateNext(view, activeStartDate));
+  const nextActiveStartDate2 = getBeginDate(view, getDateNext2(view, activeStartDate));
+
+  const prevButtonDisabled = (() => {
+    const endDate = getEndDate(view, previousActiveStartDate);
+    return minDate && minDate >= endDate;
+  }) ()
+  const prev2ButtonDisabled = (() => {
+    const endDate = getEndDate(view, previousActiveStartDate2);
+    return minDate && minDate >= endDate;
+  }) ()
+
+  const nextButtonDisabled = maxDate && maxDate < nextActiveStartDate;
+
+  const next2ButtonDisabled = maxDate && maxDate < nextActiveStartDate2;
+  
+  
   function onClickPrevious() {
-    const previousActiveStartDate = getStartDatePrevious(view, activeStartDate);
     console.log('onClickPrevious');
     setActiveStartDate(previousActiveStartDate, 'prev');
   }
 
   function onClickPrevious2() {
-    const previousActiveStartDate2 = getStartDatePrevious2(view, activeStartDate);
     console.log('onClickPrevious2');
     setActiveStartDate(previousActiveStartDate2, 'prev2');
   }
 
   function onClickNext() {
-    const nextActiveStartDate = getStartDateNext(view, activeStartDate);
     console.log('onClickNext', nextActiveStartDate);
     setActiveStartDate(nextActiveStartDate, 'next');
   }
 
   function onClickNext2() {
-    const nextActiveStartDate2 = getStartDateNext2(view, activeStartDate);
     console.log('onClickNext2');
     setActiveStartDate(nextActiveStartDate2, 'next2');
   }
 
   function renderLabel(date: Date) {
+    // 中间标签展示的内容
     const defaultLabel = (() => {
       switch (view) {
         case View.Decade: 
@@ -117,6 +140,7 @@ export default function Navigation({
         className={`${className}__arrow ${className}__prev2-button`}
         onClick={onClickPrevious2}
         type="button"
+        disabled={prev2ButtonDisabled}
       >
         {prev2Label}
       </button>
@@ -125,6 +149,7 @@ export default function Navigation({
         className={`${className}__arrow ${className}__prev-button`}
         onClick={onClickPrevious}
         type="button"
+        disabled={prevButtonDisabled}
       >
         {prevLabel}
       </button>
@@ -134,6 +159,7 @@ export default function Navigation({
         className={`${className}__arrow ${className}__next-button`}
         onClick={onClickNext}
         type="button"
+        disabled={nextButtonDisabled}
       >
         {nextLabel}
       </button>
@@ -142,6 +168,7 @@ export default function Navigation({
         className={`${className}__arrow ${className}__next2-button`}
         onClick={onClickNext2}
         type="button"
+        disabled={next2ButtonDisabled}
       >
         {next2Label}
       </button>
