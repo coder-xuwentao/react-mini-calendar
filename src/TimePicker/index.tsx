@@ -15,7 +15,7 @@ function makeArr(length: number) {
 export interface onChangeArgs {
   hour: string,
   minute: string,
-  second: string
+  second: string;
 }
 
 interface TimePickerProps {
@@ -30,9 +30,9 @@ interface TimePickerProps {
 
 export default function TimePicker(props: TimePickerProps) {
   const { optionSize = 12, onChange, showConfirm, onConfirm, defaultDate, minDate, maxDate } = props;
-  const [hourValue, setHourValue] = useState((defaultDate && formatTimeNum(defaultDate.getHours())) ||'00');
-  const [minuteValue, setMinuteValue] = useState(defaultDate && formatTimeNum(defaultDate.getMinutes()) ||'00');
-  const [secondValue, setSecondValue] = useState(defaultDate && formatTimeNum(defaultDate.getSeconds()) ||'00');
+  const [hourValue, setHourValue] = useState((defaultDate && formatTimeNum(defaultDate.getHours())) || '00');
+  const [minuteValue, setMinuteValue] = useState(defaultDate && formatTimeNum(defaultDate.getMinutes()) || '00');
+  const [secondValue, setSecondValue] = useState(defaultDate && formatTimeNum(defaultDate.getSeconds()) || '00');
 
   const handleHourChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
     setHourValue(event.target.value);
@@ -47,7 +47,7 @@ export default function TimePicker(props: TimePickerProps) {
   }, []);
 
   useEffect(function handleChange() {
-    onChange?.({hour: hourValue, minute: minuteValue, second: secondValue});
+    onChange?.({ hour: hourValue, minute: minuteValue, second: secondValue });
   }, [onChange, hourValue, minuteValue, secondValue]);
 
   function renderResult() {
@@ -64,19 +64,19 @@ export default function TimePicker(props: TimePickerProps) {
           className='mini-time-picker__result__button'
         >✔</button>
       </div>
-    )
+    );
   }
 
   function renderSelectWheel() {
     const gethourDisabled = (hour: number) => {
-      return (minDate && hour < minDate.getHours()) || (maxDate && hour > maxDate.getHours())
-    }
+      return (minDate && hour < minDate.getHours()) || (maxDate && hour > maxDate.getHours());
+    };
     const getMinuteDisabled = (minute: number) => {
-      return (minDate && minute < minDate.getMinutes()) || (maxDate && minute > maxDate.getMinutes())
-    }
+      return (minDate && minute < minDate.getMinutes()) || (maxDate && minute > maxDate.getMinutes());
+    };
     const getSecondDisabled = (second: number) => {
-      return (minDate && second < minDate.getSeconds()) || (maxDate && second > maxDate.getSeconds())
-    }
+      return (minDate && second < minDate.getSeconds()) || (maxDate && second > maxDate.getSeconds());
+    };
     return (
       <div className='mini-time-picker__scrollboxs'>
         {/* 时 */}
@@ -86,7 +86,7 @@ export default function TimePicker(props: TimePickerProps) {
           onChange={handleHourChange}
         >
           {makeArr(24).map(hour => (
-            <option key={hour} value={formatTimeNum(hour)} 
+            <option key={hour} value={formatTimeNum(hour)}
               disabled={gethourDisabled(hour)}
             >{formatTimeNum(hour)}</option>
           ))}
@@ -110,13 +110,13 @@ export default function TimePicker(props: TimePickerProps) {
           onChange={handleSecondChange}
         >
           {makeArr(60).map(second => (
-            <option key={second} value={formatTimeNum(second)} 
-            disabled={getSecondDisabled(second)}
+            <option key={second} value={formatTimeNum(second)}
+              disabled={getSecondDisabled(second)}
             >{formatTimeNum(second)}</option>
           ))}
         </select>
       </div>
-    )
+    );
   }
 
   return (

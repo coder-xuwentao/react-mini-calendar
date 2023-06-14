@@ -60,7 +60,7 @@ export default function Calendar(props: CalendarProps) {
     ...otherProps
   } = props;
   const [activeStartDateState, setActiveStartDateState] = useState<Date>(getInitActiveStartDate(defaultValue, valueProp));
-  const [viewState, setViewState] = useState<View>(defaultView|| View.Month);
+  const [viewState, setViewState] = useState<View>(defaultView ?? View.Month);
   const [valueState, setValueState] = useState<Value>(defaultValue);
   const value = useMemo<Value>(() => {
     if (valueProp !== undefined) {
